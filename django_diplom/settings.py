@@ -39,12 +39,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
-    'rest_framework.authtoken',
-
     'django_filters',
 
     'shop',
+
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+
+    'djoser',
+
+    # No need to include these ones in Django 3.2
+    # 'rest_framework',
+
 ]
 
 MIDDLEWARE = [
@@ -137,5 +143,10 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
-    ]
-}
+        ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication'
+        ],
+
+    }

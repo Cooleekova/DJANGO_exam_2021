@@ -1,9 +1,16 @@
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from .permissions import IsOwnerOrReadOnly, ReadOnly
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly, ReadOnly, IsAdminUser
 from .models import Product, Review, Order, Collection
-from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer, CollectionSerializer
+from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer, CollectionSerializer, UserSerializer
 from .filters import ProductFilter, ReviewFilter, OrderFilter
+from django.contrib.auth.models import User
+
+
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsOwnerOrReadOnly]
 
 
 class ProductViewSet(ModelViewSet):
@@ -18,9 +25,17 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
     filterset_class = ReviewFilter
     # Before running the main body of the view each permission in the list is checked.
-    """Оставлять отзыв к товару могут только авторизованные пользователи."""
-    """Пользователь может обновлять и удалять только свой собственный отзыв."""
-    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    # permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_permissions(self):
+        """Оставлять отзыв к товару могут только авторизованные пользователи."""
+        """Пользователь может обновлять и удалять только свой собственный отзыв."""
+        if self.action == "create":
+            return [IsAuthenticated()]
+        if self.action in ["update", "partial_update", "destroy"]:
+            return [IsOwnerOrReadOnly()]
+        return []
 
 
 class OrderViewSet(ModelViewSet):
@@ -33,13 +48,10 @@ class OrderViewSet(ModelViewSet):
 
     def get_queryset(self):
         """Админы могут получать все заказы, остальное пользователи только свои."""
-        if self.request.user.is_stuff:
-            return self.request.order.objects.all()
+        if self.request.user.is_superuser:
+            return Order.objects.all()
         else:
-            return self.request.order.objects.filter(creator=self.request.user)
-
-    """Менять статус заказа могут только админы."""
-    # здесь нужно написать логику
+            return Order.objects.filter(creator=self.request.user)
 
 
 class CollectionViewSet(ModelViewSet):

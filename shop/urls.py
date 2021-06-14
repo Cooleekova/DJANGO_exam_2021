@@ -17,12 +17,17 @@ Including another URLconf
 from shop import views
 from rest_framework.routers import DefaultRouter
 
+from shop.views import UserViewSet
+
 router = DefaultRouter()
 
 router.register('products', views.ProductViewSet, basename='products')
 router.register('product-reviews', views.ReviewViewSet, basename='product-reviews')
 router.register('orders', views.OrderViewSet, basename='orders')
 router.register('product-collections', views.CollectionViewSet, basename='product-collections')
+
+router.register('all-profiles', UserViewSet, basename='all-profiles')
+router.register('profile/<int:pk>', UserViewSet, basename='profile')
 
 
 urlpatterns = router.urls

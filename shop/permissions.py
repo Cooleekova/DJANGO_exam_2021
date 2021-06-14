@@ -15,7 +15,7 @@ class IsAdminUser(permissions.BasePermission):
         # Create permissions for admins only
         if request.method in permissions.SAFE_METHODS:
             return True
-        return bool(request.user and request.user.is_staff)
+        return bool(request.user and request.user.is_superuser)
 
 
 # Пользователь может обновлять и удалять только свой собственный отзыв.

@@ -1,21 +1,29 @@
-from django_filters import rest_framework as filters
-from .models import Product, Review, Order
+from django_filters import rest_framework as filters, ChoiceFilter, DateFromToRangeFilter, RangeFilter, CharFilter
+from shop.models import Product, Review, Order, OrderStatus
 
 
 class ProductFilter(filters.FilterSet):
     """Фильтр для товаров."""
     """ по цене и содержимому из названия / описания"""
 
-    # здесь нужно прописать логику для фильтра
+    price = RangeFilter(field_name='price')
+    title = CharFilter(field_name='title', lookup_expr='icontains')
+    description = CharFilter(field_name='description', lookup_expr='icontains')
 
     class Meta:
         model = Product
-        fields = ['price', 'title', 'description']
+        fields = [
+            'price',
+            'title',
+            'description',
+        ]
 
 
 class ReviewFilter(filters.FilterSet):
     """Фильтр для отзывов к товарам."""
     """ по ID пользователя, дате создания и ID товара """
+
+    created = DateFromToRangeFilter(field_name='created_at')
 
     class Meta:
         model = Review
@@ -27,8 +35,13 @@ class OrderFilter(filters.FilterSet):
     """Фильтр для заказов."""
     """ по статусу / общей сумме / дате создания / дате обновления и продуктам из позиций."""
 
-    # здесь нужно прописать логику для фильтра
-    # Order.objects.filter(positions__product__''''')
+    status = ChoiceFilter(choices=OrderStatus.choices)
+    total_amount = RangeFilter(field_name='total_amount')
+    created = DateFromToRangeFilter(field_name='created_at')
+    updated = DateFromToRangeFilter(field_name='updated_at')
+    products = filters.CharFilter(field_name='productsinorder__product__title',
+                                  lookup_expr='icontains'
+                                  )
 
     class Meta:
         model = Order
@@ -37,8 +50,5 @@ class OrderFilter(filters.FilterSet):
             'total_amount',
             'created_at',
             'updated_at',
-            'positions'
+            'positions',
         ]
-
-
-

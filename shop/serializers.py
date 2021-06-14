@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.db import models
 from .models import Product, Review, Order, Collection
 
 
@@ -8,8 +9,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name',
-                  'last_name',)
+        fields = '__all__'
+        # fields = ('id', 'username', 'first_name',
+        #           'last_name',)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -27,7 +29,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Review
-        fields = ['creator', 'product', 'description', 'grade', 'created_at', 'updated_at']
+        fields = ['id', 'creator', 'product', 'description', 'grade', 'created_at', 'updated_at']
 
     def create(self, validated_data):
         """Метод для создания"""
@@ -40,7 +42,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         """ 1 пользователь не может оставлять более 1го отзыва."""
 
         creator = self.context["request"].user
-        review_quantity = Review.objects.filter(creator=creator).select_related('product').count()
+        product = data["product"]
+        review_quantity = Review.objects.filter(creator=creator.id, product=product).count()
         if self.context["request"].method == "POST" and review_quantity >= 1:
             raise serializers.ValidationError(f'Отзыв к данному товару уже опубликован')
         else:
