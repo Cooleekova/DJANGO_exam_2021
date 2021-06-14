@@ -5,7 +5,7 @@ from rest_framework.status import HTTP_200_OK
 
 # проверка получения списка отзывов
 @pytest.mark.django_db
-def test_collection_list(client, review_factory):
+def test_review_list(client, review_factory):
     # создаём десять отзывов
     review = review_factory(_quantity=10)
     url = reverse("product-reviews-list")
