@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters, ChoiceFilter, DateFromToRangeFilter, RangeFilter, CharFilter
-from shop.models import Product, Review, Order, OrderStatus
+from shop.models import Product, Review, Order
 
 
 class ProductFilter(filters.FilterSet):
@@ -35,7 +35,7 @@ class OrderFilter(filters.FilterSet):
     """Фильтр для заказов."""
     """ по статусу / общей сумме / дате создания / дате обновления и продуктам из позиций."""
 
-    status = ChoiceFilter(choices=OrderStatus.choices)
+    status = ChoiceFilter(choices=Order.OrderStatus.choices)
     total_amount = RangeFilter(field_name='total_amount')
     created = DateFromToRangeFilter(field_name='created_at')
     updated = DateFromToRangeFilter(field_name='updated_at')

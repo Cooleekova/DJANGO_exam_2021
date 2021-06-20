@@ -40,7 +40,7 @@ class ReviewViewSet(ModelViewSet):
 
 class OrderViewSet(ModelViewSet):
 
-    queryset = Order.objects.all()
+    queryset = Order.objects.all().defer('status')
     serializer_class = OrderSerializer
     filterset_class = OrderFilter
     """ Создавать заказы могут только авторизованные пользователи """

@@ -19,11 +19,15 @@ class StandardFields(models.Model):
 
 class Product(StandardFields):
 
-    title = models.CharField(max_length=50)
+    title = models.CharField(
+        max_length=50,
+        verbose_name='Название товара',
+    )
     description = models.TextField(default='')
     price = models.DecimalField(
         max_digits=10,
-        decimal_places=2
+        decimal_places=2,
+        verbose_name='Цена',
     )
 
     def __str__(self):
@@ -49,7 +53,7 @@ class Review(StandardFields):
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        verbose_name='Автор отзыва'
+        verbose_name='Автор отзыва',
     )
 
     product = models.ForeignKey(
@@ -76,15 +80,14 @@ class Review(StandardFields):
         verbose_name_plural = 'Отзывы'
 
 
-class OrderStatus(models.TextChoices):
-    """Статусы заказа."""
-
-    NEW = "NEW", "Новый"
-    IN_PROGRESS = "IN_PROGRESS", "В обработке"
-    DONE = "DONE", "Закрыт"
-
-
 class Order(StandardFields):
+
+    class OrderStatus(models.TextChoices):
+        """Статусы заказа."""
+
+        NEW = "NEW", "Новый"
+        IN_PROGRESS = "IN_PROGRESS", "В обработке"
+        DONE = "DONE", "Закрыт"
 
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -98,9 +101,10 @@ class Order(StandardFields):
         through='ProductsInOrder',
     )
 
-    status = models.TextField(
+    status = models.CharField(
         choices=OrderStatus.choices,
-        default=OrderStatus.NEW
+        default=OrderStatus.NEW,
+        max_length=12,
     )
 
     total_amount = models.DecimalField(
@@ -132,16 +136,20 @@ class ProductsInOrder(models.Model):
 
 class Collection(StandardFields):
 
-    title = models.TextField()
+    title = models.TextField(
+        verbose_name='Название коллекции'
+    )
     description = models.TextField(
         default='',
         blank=False,
         null=False,
+        verbose_name='Описание коллекции',
     )
 
     products = models.ManyToManyField(
         'Product',
-        related_name='collections'
+        related_name='collections',
+        verbose_name='Товары в подборке',
     )
 
     def __str__(self):
